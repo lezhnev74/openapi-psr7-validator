@@ -79,10 +79,10 @@ class FormUrlencodedValidator implements MessageValidator
     {
         $body = [];
 
-        foreach (explode('&', $message->getBody()->getContents()) as $chunk) {
-            [$name, $value] = explode('=', $chunk);
-            $body[$name]    = $value;
-        }
+        parse_str(
+            $message->getBody()->getContents(),
+            $body
+        );
 
         return $body;
     }
