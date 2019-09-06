@@ -63,11 +63,20 @@ final class QueryArgumentsValidator implements MessageValidator
                 // todo: maybe make this optional
                 continue;
             }
+			$spec = $specs[$name];
+
+			if ($spec->explode === false && is_string($argumentValue)) {
+				$argumentValue = explode(',', $argumentValue);
+			}
 
             $validator = new SchemaValidator($this->detectValidationStrategy($message));
             try {
                 $validator->validate($argumentValue, $specs[$name]->schema, new BreadCrumb($name));
             } catch (SchemaMismatch $e) {
+				$argumentValue = $parsedQueryArguments[$name];
+            	if (is_array($argumentValue)) {
+					$argumentValue = json_encode($argumentValue, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+				}
                 throw InvalidQueryArgs::becauseValueDoesNotMatchSchema($name, $argumentValue, $addr, $e);
             }
         }
