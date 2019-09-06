@@ -57,6 +57,7 @@ YAML;
 
         try {
 			$validator->validate($psrRequest);
+			self::assertFalse(true);
 		} catch (InvalidQueryArgs $exception) {
         	self::assertEquals('Value "string1" for argument "ids" is invalid for Request [get /test_id]', $exception->getMessage());
 		}
@@ -68,6 +69,7 @@ YAML;
 
 		try {
 			$validator->validate($psrRequest);
+			self::assertFalse(true);
 		} catch (InvalidQueryArgs $exception) {
 			self::assertEquals('Value "["string_array"]" for argument "ids" is invalid for Request [get /test_id]', $exception->getMessage());
 		}
