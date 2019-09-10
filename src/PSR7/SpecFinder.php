@@ -22,6 +22,7 @@ use OpenAPIValidation\PSR7\Exception\NoOperation;
 use OpenAPIValidation\PSR7\Exception\NoPath;
 use OpenAPIValidation\PSR7\Exception\NoResponseCode;
 use OpenAPIValidation\Schema\Exception\InvalidSchema;
+use Webmozart\Assert\Assert;
 use function json_decode;
 use function json_encode;
 use function property_exists;
@@ -175,7 +176,7 @@ final class SpecFinder
      */
     public function findBodySpec(OperationAddress $addr) : array
     {
-        if ($addr instanceof ResponseAddress) {
+        if ($addr instanceof ResponseAddress || $addr instanceof CallbackResponseAddress) {
             return $this->findResponseSpec($addr)->content;
         }
 
@@ -191,10 +192,18 @@ final class SpecFinder
     /**
      * Find the schema which describes a given response
      *
+     * @param ResponseAddress|CallbackResponseAddress $addr
+     *
      * @throws NoPath
+     * @throws NoResponseCode
      */
-    public function findResponseSpec(ResponseAddress $addr) : ResponseSpec
+    public function findResponseSpec($addr) : ResponseSpec
     {
+        Assert::isInstanceOfAny($addr, [
+            ResponseAddress::class,
+            CallbackResponseAddress::class,
+        ]);
+
         $operation = $this->findOperationSpec($addr);
 
         $response = $operation->responses->getResponse($addr->responseCode());
@@ -222,7 +231,7 @@ final class SpecFinder
     public function findHeaderSpecs(OperationAddress $addr) : array
     {
         // Response headers are specified differently from request headers
-        if ($addr instanceof ResponseAddress) {
+        if ($addr instanceof ResponseAddress || $addr instanceof CallbackResponseAddress) {
             return $this->findResponseSpec($addr)->headers;
         }
 
