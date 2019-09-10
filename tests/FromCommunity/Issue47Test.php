@@ -8,6 +8,7 @@ use GuzzleHttp\Psr7\ServerRequest;
 use OpenAPIValidation\PSR7\Exception\Validation\InvalidQueryArgs;
 use OpenAPIValidation\PSR7\ValidatorBuilder;
 use PHPUnit\Framework\TestCase;
+use function http_build_query;
 
 final class Issue47Test extends TestCase
 {
@@ -50,36 +51,33 @@ YAML;
 
         $validator = (new ValidatorBuilder())->fromYaml($yaml)->getServerRequestValidator();
 
-
         $query_params = ['ids' => 'string1'];
-        $psrRequest = (new ServerRequest('get', 'http://localhost:8000/api/v1/test_id?'.http_build_query($query_params)));
-        $psrRequest = $psrRequest->withQueryParams($query_params);
+        $psrRequest   = (new ServerRequest('get', 'http://localhost:8000/api/v1/test_id?' . http_build_query($query_params)));
+        $psrRequest   = $psrRequest->withQueryParams($query_params);
 
         try {
-			$validator->validate($psrRequest);
-			self::assertFalse(true);
-		} catch (InvalidQueryArgs $exception) {
-        	self::assertEquals('Value "string1" for argument "ids" is invalid for Request [get /test_id]', $exception->getMessage());
-		}
+            $validator->validate($psrRequest);
+            self::assertFalse(true);
+        } catch (InvalidQueryArgs $exception) {
+            self::assertEquals('Value "string1" for argument "ids" is invalid for Request [get /test_id]', $exception->getMessage());
+        }
 
+        $query_params = ['ids' => ['string_array']];
+        $psrRequest   = (new ServerRequest('get', 'http://localhost:8000/api/v1/test_id?' . http_build_query($query_params)));
+        $psrRequest   = $psrRequest->withQueryParams($query_params);
 
-		$query_params = ['ids' => ['string_array']];
-		$psrRequest = (new ServerRequest('get', 'http://localhost:8000/api/v1/test_id?'.http_build_query($query_params)));
-		$psrRequest = $psrRequest->withQueryParams($query_params);
+        try {
+            $validator->validate($psrRequest);
+            self::assertFalse(true);
+        } catch (InvalidQueryArgs $exception) {
+            self::assertEquals('Value "["string_array"]" for argument "ids" is invalid for Request [get /test_id]', $exception->getMessage());
+        }
 
-		try {
-			$validator->validate($psrRequest);
-			self::assertFalse(true);
-		} catch (InvalidQueryArgs $exception) {
-			self::assertEquals('Value "["string_array"]" for argument "ids" is invalid for Request [get /test_id]', $exception->getMessage());
-		}
+        $query_params = ['ids' => [5]];
+        $psrRequest   = (new ServerRequest('get', 'http://localhost:8000/api/v1/test_id?' . http_build_query($query_params)));
+        $psrRequest   = $psrRequest->withQueryParams($query_params);
 
-
-		$query_params = ['ids' => [5]];
-		$psrRequest = (new ServerRequest('get', 'http://localhost:8000/api/v1/test_id?'.http_build_query($query_params)));
-		$psrRequest = $psrRequest->withQueryParams($query_params);
-
-		$validator->validate($psrRequest);
+        $validator->validate($psrRequest);
 
         $this->addToAssertionCount(1);
     }

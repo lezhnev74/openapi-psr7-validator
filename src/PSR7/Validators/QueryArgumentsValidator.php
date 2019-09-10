@@ -14,7 +14,13 @@ use OpenAPIValidation\Schema\Exception\SchemaMismatch;
 use OpenAPIValidation\Schema\SchemaValidator;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use const JSON_UNESCAPED_SLASHES;
+use const JSON_UNESCAPED_UNICODE;
 use function array_key_exists;
+use function explode;
+use function is_array;
+use function is_string;
+use function json_encode;
 use function parse_str;
 
 final class QueryArgumentsValidator implements MessageValidator
@@ -63,20 +69,20 @@ final class QueryArgumentsValidator implements MessageValidator
                 // todo: maybe make this optional
                 continue;
             }
-			$spec = $specs[$name];
+            $spec = $specs[$name];
 
-			if ($spec->explode === false && is_string($argumentValue)) {
-				$argumentValue = explode(',', $argumentValue);
-			}
+            if ($spec->explode === false && is_string($argumentValue)) {
+                $argumentValue = explode(',', $argumentValue);
+            }
 
             $validator = new SchemaValidator($this->detectValidationStrategy($message));
             try {
                 $validator->validate($argumentValue, $specs[$name]->schema, new BreadCrumb($name));
             } catch (SchemaMismatch $e) {
-				$argumentValue = $parsedQueryArguments[$name];
-            	if (is_array($argumentValue)) {
-					$argumentValue = json_encode($argumentValue, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-				}
+                $argumentValue = $parsedQueryArguments[$name];
+                if (is_array($argumentValue)) {
+                    $argumentValue = json_encode($argumentValue, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                }
                 throw InvalidQueryArgs::becauseValueDoesNotMatchSchema($name, $argumentValue, $addr, $e);
             }
         }
