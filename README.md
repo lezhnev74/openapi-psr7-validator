@@ -3,6 +3,12 @@
 [![License](https://poser.pugx.org/lezhnev74/openapi-psr7-validator/license)](https://packagist.org/packages/lezhnev74/openapi-psr7-validator)
 ![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)
 
+# NOTICE - THE PACKAGE HAS BEEN CONTRIBUTED TO THE PHP LEAGUE
+
+Go to https://github.com/thephpleague/openapi-psr7-validator
+
+This package is here for existing users only.
+
 # OpenAPI PSR-7 Message (HTTP Request/Response) Validator
 This package can validate PSR-7 messages against OpenAPI (3.0.x) specifications 
 expressed in YAML or JSON. 
