@@ -15,8 +15,6 @@ final class YamlFileFactory extends FileFactory
     {
         $schema = Reader::readFromYamlFile($this->getFilename());
 
-        $schema->resolveReferences(new ReferenceContext($schema, realpath($this->getFilename())));
-
         return $schema;
     }
 }
