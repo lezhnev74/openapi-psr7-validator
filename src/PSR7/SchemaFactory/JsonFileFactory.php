@@ -15,8 +15,6 @@ final class JsonFileFactory extends FileFactory
     {
         $schema = Reader::readFromJsonFile($this->getFilename());
 
-        $schema->resolveReferences(new ReferenceContext($schema, realpath($this->getFilename())));
-
         return $schema;
     }
 }
