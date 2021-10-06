@@ -3,15 +3,17 @@
 [![License](https://poser.pugx.org/lezhnev74/openapi-psr7-validator/license)](https://packagist.org/packages/lezhnev74/openapi-psr7-validator)
 ![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)
 
+# NOTICE - THE PACKAGE HAS BEEN CONTRIBUTED TO THE PHP LEAGUE
+
+Go to https://github.com/thephpleague/openapi-psr7-validator
+
+This package is here for existing users only.
+
 # OpenAPI PSR-7 Message (HTTP Request/Response) Validator
 This package can validate PSR-7 messages against OpenAPI (3.0.x) specifications 
 expressed in YAML or JSON. 
 
 ![](image.jpg)
-
-## Requirements
-
-- PHP 7.1 or higher
 
 ## Installation
 ```
@@ -67,6 +69,27 @@ $validator->validate($address, $request);
 ```
 
 This would simplify validation a lot and give you more performance.
+
+### Request Message
+You can validate `\Psr\Http\Message\RequestInterface` instance like this:
+
+```php
+$yamlFile = "api.yaml";
+$jsonFile = "api.json";
+
+$validator = (new \OpenAPIValidation\PSR7\ValidatorBuilder)->fromYamlFile($yamlFile)->getRequestValidator();
+#or
+$validator = (new \OpenAPIValidation\PSR7\ValidatorBuilder)->fromYaml(file_get_contents($yamlFile))->getRequestValidator();
+#or
+$validator = (new \OpenAPIValidation\PSR7\ValidatorBuilder)->fromJson(file_get_contents($jsonFile))->getRequestValidator();
+#or
+$validator = (new \OpenAPIValidation\PSR7\ValidatorBuilder)->fromJsonFile($jsonFile)->getRequestValidator();
+#or
+$schema = new \cebe\openapi\spec\OpenApi(); // generate schema object by hand
+$validator = (new \OpenAPIValidation\PSR7\ValidatorBuilder)->fromSchema($schema)->getRequestValidator();
+
+$match = $validator->validate($request);
+```
 
 ### Response Message
 Validation of `\Psr\Http\Message\ResponseInterface` is a bit more complicated
@@ -323,6 +346,3 @@ The MIT License (MIT). Please see `License.md` file for more information.
 
 ## TODO
 - [ ] Support Discriminator Object (note: apparently, this is not so straightforward, as discriminator can point to any external scheme)
-- [ ] add validation for Request class.
-    - Usually for serverside testing purposes ServerRequest is what we need. 
-    But, Request should be quite easy to add.
